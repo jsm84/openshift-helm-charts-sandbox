@@ -149,7 +149,7 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
           # Sandbox repo does not have an helm repository index
-          if [ "$GITHUB_REPOSITORY" == "openshift-helm-charts/sandbox" ]; then
+          if [[ ${GITHUB_REPOSITORY} =~ ^.*sandbox$ ]]; then
             CLI_FLAG="--ignore_missing_helm_index"
           fi
 
@@ -158,7 +158,7 @@ jobs:
             --output "$SUBMISSION_PATH" \
             --repository ${{ github.repository }} \
             ${CLI_FLAG}
-      
+
       - name: Upload PR information
         uses: actions/upload-artifact@v4
         if: ${{ always() }}
@@ -466,7 +466,7 @@ jobs:
         run: |
           commentBase64=$(base64 --wrap=0 ${{ steps.pr_comment.outputs.message-file }})
           echo "message-text-base64=${commentBase64}" | tee -a $GITHUB_OUTPUT
-        
+
       - name: Comment on PR
         if: ${{ needs.setup.outputs.run_build == 'true' }}
         uses: actions/github-script@v7
@@ -606,7 +606,7 @@ jobs:
               ${{ steps.prepare-chart-release.outputs.public_key_file }}
               ${{ steps.prepare-chart-release.outputs.path_to_chart_tarball }}
               ${{ steps.prepare-chart-release.outputs.prov_file_name }}
-          fail_on_unmatched_files: true 
+          fail_on_unmatched_files: true
 
       - name: Update Helm repository index
         if: ${{ needs.setup.outputs.run_build == 'true' }}
